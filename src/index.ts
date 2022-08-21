@@ -167,13 +167,21 @@ const RecurringTweets = async () => {
 
     fs.writeFileSync("data.json", JSON.stringify(data));
 
-    // const mediaid = await refreshedClient.v1.uploadMedia("./src/media/fotm.mp4");
-    // console.log(mediaid);
+    const today = new Date();
+    const xmas = new Date(today.getFullYear(), 11, 25);
+    if (today.getMonth() == 11 && today.getDate() > 25) {
+        xmas.setFullYear(xmas.getFullYear() + 1);
+    }
+    const oneDay = 1000 * 60 * 60 * 24;
+    const daysLeft = Math.ceil((xmas.getTime() - today.getTime()) / oneDay)
 
-    const result = await refreshedClient.v2.tweet("Test");
-
-    console.log(result.errors);
-
+    if (daysLeft == 0) {
+        const result = await refreshedClient.v2.tweet(`There are ${daysLeft} days until Christmas.`);
+        console.log(result.errors);
+    } else {
+        const result = await refreshedClient.v2.tweet(`There are ${daysLeft} days until Christmas.`);
+        console.log(result.errors);
+    }
 };
 
 app.use(errorHandler());
@@ -185,4 +193,4 @@ app.listen(port, () => {
     console.info(`Koa app started and listening to port ${port}! 🚀`);
 });
 
-// RecurringTweets()
+RecurringTweets()
