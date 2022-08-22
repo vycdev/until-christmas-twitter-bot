@@ -4,7 +4,8 @@
     "description": "A twitter bot that tweets once a month with a funny video.",
     "main": "src/index.ts",
     "scripts": {
-        "start": "nodemon"
+        "dev": "cross-env NODE_ENV=development nodemon",
+        "start": "ts-node src/index.ts"
     },
     "repository": "git+https://github.com/vycdev/first-of-the-month-twitter-bot.git",
     "author": "Sandu Victor",
@@ -19,6 +20,7 @@
         "@types/koa-logger": "^3.1.2",
         "@types/koa-router": "^7.4.4",
         "@types/node": "^18.7.6",
+        "cross-env": "^7.0.3",
         "dotenv": "^16.0.1",
         "koa": "^2.13.4",
         "koa-bodyparser": "^4.3.0",

@@ -139,6 +139,25 @@ router.get("/tweet", async (ctx, next) => {
     await next();
 });
 
+const getTweetString = async (): Promise<string> => {
+    const today = new Date();
+    const xmas = new Date(today.getFullYear(), 11, 25);
+    if (today.getMonth() == 11 && today.getDate() > 25) {
+        xmas.setFullYear(xmas.getFullYear() + 1);
+    }
+    const oneDay = 1000 * 60 * 60 * 24;
+    const daysLeft = Math.ceil((xmas.getTime() - today.getTime()) / oneDay)
+
+    if (daysLeft == 0) {
+        return `Merry Christmas!!`
+    } else {
+        return `There are ${daysLeft} days left until Christmas.`
+    }
+}
+
+// console.log(getTweetString());
+
+
 const RecurringTweets = async () => {
     const storedData = await JSON.parse(fs.readFileSync("data.json", "utf-8"));
     if (
@@ -167,30 +186,26 @@ const RecurringTweets = async () => {
 
     fs.writeFileSync("data.json", JSON.stringify(data));
 
-    const today = new Date();
-    const xmas = new Date(today.getFullYear(), 11, 25);
-    if (today.getMonth() == 11 && today.getDate() > 25) {
-        xmas.setFullYear(xmas.getFullYear() + 1);
-    }
-    const oneDay = 1000 * 60 * 60 * 24;
-    const daysLeft = Math.ceil((xmas.getTime() - today.getTime()) / oneDay)
+    const result = await refreshedClient.v2.tweet(await getTweetString())
 
-    if (daysLeft == 0) {
-        const result = await refreshedClient.v2.tweet(`There are ${daysLeft} days until Christmas.`);
+    if (result.errors)
         console.log(result.errors);
-    } else {
-        const result = await refreshedClient.v2.tweet(`There are ${daysLeft} days until Christmas.`);
-        console.log(result.errors);
-    }
+
 };
 
-app.use(errorHandler());
-app.use(bodyParser());
-app.use(logger());
-app.use(router.routes()).use(router.allowedMethods());
+if (process.env.NODE_ENV === "development") {
+    app.use(errorHandler());
+    app.use(bodyParser());
+    app.use(logger());
+    app.use(router.routes()).use(router.allowedMethods());
 
-app.listen(port, () => {
-    console.info(`Koa app started and listening to port ${port}! 🚀`);
-});
+    app.listen(port, () => {
+        console.info(`Koa app started and listening to port ${port}! 🚀`);
+    });
+}
 
-RecurringTweets()
+try {
+    RecurringTweets()
+} catch (error) {
+    console.error(error)
+}
